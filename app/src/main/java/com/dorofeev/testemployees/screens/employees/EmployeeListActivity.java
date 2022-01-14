@@ -1,4 +1,4 @@
-package com.dorofeev.testemployees;
+package com.dorofeev.testemployees.screens.employees;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,13 +22,11 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class EmployeeListActivity extends AppCompatActivity implements EmployeesListView{
 
     private ActivityMainBinding binding;
-
     private EmployeeAdapter employeeAdapter;
-    private Disposable disposable;
-    private CompositeDisposable compositeDisposable;
+    private EmployeeListPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,39 +34,26 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        presenter = new EmployeeListPresenter(this);
         employeeAdapter = new EmployeeAdapter();
         employeeAdapter.setEmployeeList(new ArrayList<>());
         binding.recyclerViewEmployees.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewEmployees.setAdapter(employeeAdapter);
 
-        ApiFactory apiFactory = ApiFactory.getInstance();
-        ApiService apiService = apiFactory.getApiService();
+        presenter.loadData();
+    }
 
-        compositeDisposable = new CompositeDisposable();
+    public void showData(List<Employee> employeeList) {
+        employeeAdapter.setEmployeeList(employeeList);
+    }
 
-        disposable = apiService.getEmployees()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<EmployeeResponse>() {
-                    @Override
-                    public void accept(EmployeeResponse employeeResponse) throws Throwable {
-                        employeeAdapter.setEmployeeList(employeeResponse.getEmployeeList());
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        Toast.makeText(getApplicationContext(), "Data loading error", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        compositeDisposable.add(disposable);
+    public void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onDestroy() {
-        if (compositeDisposable != null) {
-            compositeDisposable.clear();
-        }
+        presenter.disposeDisposable();
         super.onDestroy();
     }
 }
