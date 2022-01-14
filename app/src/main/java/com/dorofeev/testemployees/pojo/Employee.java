@@ -1,17 +1,27 @@
 package com.dorofeev.testemployees.pojo;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
+
+import com.dorofeev.testemployees.converters.Converter;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+@Entity(tableName = "employees")
+@TypeConverters(value = Converter.class)
 public class Employee {
+    @PrimaryKey(autoGenerate = true)
+    private int id;
     @SerializedName("f_name")
     @Expose
-    private String fName;
+    private String firstName;
     @SerializedName("l_name")
     @Expose
-    private String lName;
+    private String lastName;
     @SerializedName("birthday")
     @Expose
     private String birthday;
@@ -22,20 +32,28 @@ public class Employee {
     @Expose
     private List<Specialty> specialty = null;
 
-    public String getfName() {
-        return fName;
+    public int getId() {
+        return id;
     }
 
-    public void setfName(String fName) {
-        this.fName = fName;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getlName() {
-        return lName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setlName(String lName) {
-        this.lName = lName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getBirthday() {
